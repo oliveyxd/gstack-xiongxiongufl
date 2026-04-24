@@ -119,9 +119,7 @@ export class BrowserManager {
     if (all.length === 0) return [];
 
     const joined = all.join(',');
-    if (extra.length > 0) {
-      console.log(`[browse] Loading extra extensions: ${extra.join(', ')}`);
-    }
+    console.log(`[browse] Loading extensions: ${all.join(', ')}`);
     return [
       `--disable-extensions-except=${joined}`,
       `--load-extension=${joined}`,
