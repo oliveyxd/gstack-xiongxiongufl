@@ -100,6 +100,35 @@ export class BrowserManager {
   }
 
   /**
+   * Build --disable-extensions-except and --load-extension args for
+   * launchPersistentContext, merging the gstack extension with any extra
+   * extensions the user has specified in BROWSE_EXTRA_EXTENSIONS
+   * (comma-separated list of unpacked extension directories).
+   */
+  private buildExtensionArgs(gstackExtensionPath: string | null): string[] {
+    const fs = require('fs');
+    const extra = (process.env.BROWSE_EXTRA_EXTENSIONS || '')
+      .split(',')
+      .map((p: string) => p.trim())
+      .filter((p: string) => {
+        if (!p) return false;
+        try { return fs.existsSync(p); } catch { return false; }
+      });
+
+    const all = [gstackExtensionPath, ...extra].filter(Boolean) as string[];
+    if (all.length === 0) return [];
+
+    const joined = all.join(',');
+    if (extra.length > 0) {
+      console.log(`[browse] Loading extra extensions: ${extra.join(', ')}`);
+    }
+    return [
+      `--disable-extensions-except=${joined}`,
+      `--load-extension=${joined}`,
+    ];
+  }
+
+  /**
    * Find the gstack Chrome extension directory.
    * Checks: repo root /extension, global install, dev install.
    */
@@ -219,20 +248,16 @@ export class BrowserManager {
 
     // Find the gstack extension directory for auto-loading
     const extensionPath = this.findExtensionPath();
-    const launchArgs = ['--hide-crash-restore-bubble'];
-    if (extensionPath) {
-      launchArgs.push(`--disable-extensions-except=${extensionPath}`);
-      launchArgs.push(`--load-extension=${extensionPath}`);
-      // Write auth token for extension bootstrap (read via chrome.runtime.getURL)
-      if (authToken) {
-        const fs = require('fs');
-        const path = require('path');
-        const authFile = path.join(extensionPath, '.auth.json');
-        try {
-          fs.writeFileSync(authFile, JSON.stringify({ token: authToken }), { mode: 0o600 });
-        } catch (err: any) {
-          console.warn(`[browse] Could not write .auth.json: ${err.message}`);
-        }
+    const launchArgs = ['--hide-crash-restore-bubble', ...this.buildExtensionArgs(extensionPath)];
+    // Write auth token for extension bootstrap (read via chrome.runtime.getURL)
+    if (extensionPath && authToken) {
+      const fs = require('fs');
+      const path = require('path');
+      const authFile = path.join(extensionPath, '.auth.json');
+      try {
+        fs.writeFileSync(authFile, JSON.stringify({ token: authToken }), { mode: 0o600 });
+      } catch (err: any) {
+        console.warn(`[browse] Could not write .auth.json: ${err.message}`);
       }
     }
 
@@ -821,10 +846,8 @@ export class BrowserManager {
       const fs = require('fs');
       const path = require('path');
       const extensionPath = this.findExtensionPath();
-      const launchArgs = ['--hide-crash-restore-bubble'];
+      const launchArgs = ['--hide-crash-restore-bubble', ...this.buildExtensionArgs(extensionPath)];
       if (extensionPath) {
-        launchArgs.push(`--disable-extensions-except=${extensionPath}`);
-        launchArgs.push(`--load-extension=${extensionPath}`);
         // Write auth token for extension bootstrap during handoff
         if (this.serverPort) {
           try {

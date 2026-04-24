@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.14.3.0] - 2026-04-24 — Load Your Own Extensions in connect-chrome
+
+You can now load your own Chrome extensions alongside the gstack side panel when using `/connect-chrome`. Set `BROWSE_EXTRA_EXTENSIONS` to a comma-separated list of unpacked extension directories, and they will be loaded automatically on `$B connect`.
+
+### Added
+
+- **`BROWSE_EXTRA_EXTENSIONS` for headed mode.** Set this environment variable to a comma-separated list of unpacked extension directories to load them alongside the gstack extension when running `$B connect`. Example: `BROWSE_EXTRA_EXTENSIONS=/path/to/my-ext $B connect`.
+
 ## [0.14.2.0] - 2026-03-30 — Sidebar CSS Inspector + Per-Tab Agents
 
 The sidebar is now a visual design tool. Pick any element on the page and see the full CSS rule cascade, box model, and computed styles right in the Side Panel. Edit styles live and see changes instantly. Each browser tab gets its own independent agent, so you can work on multiple pages simultaneously without cross-talk. Cleanup is LLM-powered... the agent snapshots the page, understands it semantically, and removes the junk while keeping the site's identity.
