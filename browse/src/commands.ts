@@ -34,6 +34,7 @@ export const META_COMMANDS = new Set([
   'url', 'snapshot',
   'handoff', 'resume',
   'connect', 'disconnect', 'focus',
+  'load-extension',
   'inbox',
   'watch',
   'state',
@@ -124,6 +125,7 @@ export const COMMAND_DESCRIPTIONS: Record<string, { category: string; descriptio
   'connect': { category: 'Server', description: 'Launch headed Chromium with Chrome extension', usage: 'connect' },
   'disconnect': { category: 'Server', description: 'Disconnect headed browser, return to headless mode' },
   'focus':   { category: 'Server', description: 'Bring headed browser window to foreground (macOS)', usage: 'focus [@ref]' },
+  'load-extension': { category: 'Server', description: 'Restart browser with an unpacked Chrome extension loaded (headless + extension mode)', usage: 'load-extension <path>' },
   // Inbox
   'inbox':   { category: 'Meta', description: 'List messages from sidebar scout inbox', usage: 'inbox [--clear]' },
   // Watch

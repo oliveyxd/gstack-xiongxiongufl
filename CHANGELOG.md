@@ -2,11 +2,12 @@
 
 ## [0.14.3.0] - 2026-04-24 — Load Your Own Extensions in connect-chrome
 
-You can now load your own Chrome extensions alongside the gstack side panel when using `/connect-chrome`. Set `BROWSE_EXTRA_EXTENSIONS` to a comma-separated list of unpacked extension directories, and they will be loaded automatically on `$B connect`.
+You can now load your own Chrome extensions alongside the gstack side panel when using `/connect-chrome`, and there's a new `$B load-extension` command so you no longer need to set environment variables to use extensions in headless mode.
 
 ### Added
 
 - **`BROWSE_EXTRA_EXTENSIONS` for headed mode.** Set this environment variable to a comma-separated list of unpacked extension directories to load them alongside the gstack extension when running `$B connect`. Example: `BROWSE_EXTRA_EXTENSIONS=/path/to/my-ext $B connect`.
+- **`$B load-extension <path>` command.** Replaces the `BROWSE_EXTENSIONS_DIR=/path/to/ext $B goto <url>` pattern. Run `$B load-extension /path/to/your/extension` once to restart the browser with your extension loaded, then use `$B goto`, `$B snapshot`, and all other commands as normal.
 
 ## [0.14.2.0] - 2026-03-30 — Sidebar CSS Inspector + Per-Tab Agents
 

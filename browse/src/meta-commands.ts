@@ -323,6 +323,11 @@ export async function handleMetaCommand(
       return 'The connect command must be run from the CLI (not sent to a running server). Run: $B connect';
     }
 
+    case 'load-extension': {
+      // load-extension is handled as a pre-server command in cli.ts
+      return 'The load-extension command must be run from the CLI (not sent to a running server). Run: $B load-extension <path>';
+    }
+
     case 'disconnect': {
       if (bm.getConnectionMode() !== 'headed') {
         return 'Not in headed mode — nothing to disconnect.';

@@ -470,6 +470,7 @@ Multi-step:     chain (reads JSON from stdin)
 Tabs:           tabs | tab <id> | newtab [url] | closetab [id]
 Server:         status | cookie <n>=<v> | header <n>:<v>
                 useragent <str> | stop | restart
+                connect | disconnect | load-extension <path>
 Dialogs:        dialog-accept [text] | dialog-dismiss
 
 Refs:           After 'snapshot', use @e1, @e2... as selectors:
@@ -612,6 +613,44 @@ Refs:           After 'snapshot', use @e1, @e2... as selectors:
       }
     } catch (err: any) {
       console.error(`[browse] Connect failed: ${err.message}`);
+      process.exit(1);
+    }
+    process.exit(0);
+  }
+
+  // ─── Load Extension (pre-server command) ────────────────────
+  // load-extension must be handled BEFORE ensureServer() because it needs
+  // to restart the server with BROWSE_EXTENSIONS_DIR set.
+  if (command === 'load-extension') {
+    const extPath = commandArgs[0];
+    if (!extPath) {
+      console.error('Usage: $B load-extension <path-to-unpacked-extension>');
+      process.exit(1);
+    }
+    const resolvedPath = path.resolve(extPath);
+    if (!fs.existsSync(resolvedPath)) {
+      console.error(`Extension path not found: ${resolvedPath}`);
+      process.exit(1);
+    }
+
+    // Kill any existing server
+    const existingState = readState();
+    if (existingState && isProcessAlive(existingState.pid)) {
+      try { process.kill(existingState.pid, 'SIGTERM'); } catch {}
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      if (isProcessAlive(existingState.pid)) {
+        try { process.kill(existingState.pid, 'SIGKILL'); } catch {}
+        await new Promise(resolve => setTimeout(resolve, 1000));
+      }
+    }
+    try { fs.unlinkSync(config.stateFile); } catch {}
+
+    console.log(`Loading extension from: ${resolvedPath}`);
+    try {
+      await startServer({ BROWSE_EXTENSIONS_DIR: resolvedPath });
+      console.log(`Extension loaded. Browser restarted in headless+extension mode.\nUse $B goto <url> to navigate.`);
+    } catch (err: any) {
+      console.error(`[browse] load-extension failed: ${err.message}`);
       process.exit(1);
     }
     process.exit(0);
