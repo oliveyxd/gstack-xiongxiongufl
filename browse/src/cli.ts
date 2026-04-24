@@ -648,7 +648,7 @@ Refs:           After 'snapshot', use @e1, @e2... as selectors:
     console.log(`Loading extension from: ${resolvedPath}`);
     try {
       await startServer({ BROWSE_EXTENSIONS_DIR: resolvedPath });
-      console.log(`Extension loaded. Browser restarted in headless+extension mode.\nUse $B goto <url> to navigate.`);
+      console.log(`Extension loaded. Browser restarted with extension enabled.\nUse $B goto <url> to navigate.`);
     } catch (err: any) {
       console.error(`[browse] load-extension failed: ${err.message}`);
       process.exit(1);

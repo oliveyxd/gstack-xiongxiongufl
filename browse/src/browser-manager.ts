@@ -115,7 +115,7 @@ export class BrowserManager {
         try { return fs.existsSync(p); } catch { return false; }
       });
 
-    const all = [gstackExtensionPath, ...extra].filter(Boolean) as string[];
+    const all = [gstackExtensionPath, ...extra].filter((p): p is string => p != null);
     if (all.length === 0) return [];
 
     const joined = all.join(',');
